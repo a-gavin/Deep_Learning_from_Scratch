@@ -3,7 +3,7 @@
 ### Description:
 A simple Python3 application for building and training deep neural network based classifiers. Implementation inspired by the PyTorch API and notes from Dr. Brian Hutchinson's deep learning course at WWU, CSCI597J (now [CSCI581](https://catalog.wwu.edu/preview_course_nopop.php?catoid=16&coid=125176&)).
 
-Modified MNIST data set for example usage located here: _______.
+Modified MNIST data set for example usage is located [here](https://u.pcloud.link/publink/show?code=kZPXapXZOvnOHFyDp5SQY3Ac387b0SSF3C3y).
 
 **Note:** Currently, only SGD is supported.
 
