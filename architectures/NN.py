@@ -9,8 +9,8 @@ from re import split
 from scipy.special import expit as sigmoid
 from scipy.special import softmax
 
-from Model import Model
-from LinearLayer import LinearLayer
+from architectures.Model import Model
+from architectures.LinearLayer import LinearLayer
 from Utils import sigmoid_deriv, tanh_deriv, relu, relu_deriv
 
 

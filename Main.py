@@ -12,7 +12,7 @@ from sklearn.metrics import log_loss
 from sklearn.preprocessing import OneHotEncoder
 
 from DataSet import DataSet
-from NN import NN
+from architectures.NN import NN
 
 # TODO: REMOVE ME, used for debugging Relu
 np.seterr(all='raise')
