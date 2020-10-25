@@ -93,6 +93,8 @@ class NN:
         return y_hat
 
     def backward(self, y: np.ndarray, lr: float) -> None:
+        _, mb_size = y.shape
+
         # Start computing final layer gradient
         post_activation = self.post_activations[-1]
         sensitivity = post_activation - y
@@ -104,15 +106,15 @@ class NN:
 
             # Update weights and bias
             layer = self.linears[ix]
-            layer.weights -= lr * weight_gradient
-            layer.bias -= lr * sensitivity
+            layer.weights -= (lr * weight_gradient) / mb_size
+            layer.bias -= (lr * (sensitivity @ np.ones(shape=[mb_size, 1]))) / mb_size
 
             sensitivity = self.activation_deriv(self.pre_activations[ix - 1]) * (layer.weights @ sensitivity)
 
         # Gradient for first layer
         weight_gradient = self.input @ sensitivity.T
-        self.linears[0].weights -= lr * weight_gradient
-        self.linears[0].bias -= lr * sensitivity
+        self.linears[0].weights -= (lr * weight_gradient) / mb_size
+        self.linears[0].bias -= (lr * (sensitivity @ np.ones(shape=[mb_size, 1]))) / mb_size
 
         # Reset storage variables
         self.pre_activations = []
@@ -253,9 +255,12 @@ def train(model: NN, train_data: MNISTDataset, dev_data: MNISTDataset,
     for epoch in range(1, epochs+1):
         print(f"->\tEpoch {epoch}")
 
-        for ix in range(train_data.len):
-            X = train_data.inputs[ix, :].reshape([-1, 1])
-            y = train_data.targets[ix, :].reshape([-1, 1])
+        for ix in range(int(train_data.len/mb)):  # TODO: Fix iteration to ensure last data points not dropped
+            bottom_bound = ix * mb
+            upper_bound = bottom_bound + mb
+
+            X = train_data.inputs[bottom_bound:upper_bound, :].T
+            y = train_data.targets[bottom_bound:upper_bound, :].T
 
             y_pred = model.forward(X)  # TODO: Eval and print loss
             model.backward(y, lr)
@@ -269,10 +274,14 @@ def train(model: NN, train_data: MNISTDataset, dev_data: MNISTDataset,
 def test(model, data):
     acc = 0.0
     N = data.len
+    mb = 32
 
-    for ix in range(data.len):
-        X = data.inputs[ix, :].reshape([-1, 1])
-        y = data.targets[ix, :].reshape([-1, 1])
+    for ix in range(int(data.len/mb)):
+        bottom_bound = ix * mb
+        upper_bound = bottom_bound + mb
+
+        X = data.inputs[bottom_bound:upper_bound, :].T
+        y = data.targets[bottom_bound:upper_bound, :].T
 
         y_pred = model.forward(X)
 
