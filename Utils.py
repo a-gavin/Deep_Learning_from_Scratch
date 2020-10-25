@@ -32,3 +32,15 @@ def tanh_deriv(z: np.ndarray) -> np.ndarray:
 # Weight initialization
 def kaiming(input_dim, output_dim):
     return np.random.randn(input_dim, output_dim) * np.sqrt(2./input_dim)
+
+
+# Misc
+def calc_num_updates(data_size: int, mb: int) -> int:
+    # If num train data points not perfectly
+    # divisible by minibatch size, inc updates.
+    # Ensures final chunk of data not ignored.
+    num_train_updates = int(data_size / mb)
+    if data_size % mb != 0:
+        num_train_updates += 1
+
+    return num_train_updates

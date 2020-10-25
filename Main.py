@@ -13,6 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 from DataSet import DataSet
 from architectures.NN import NN
+from Utils import calc_num_updates
 
 # TODO: REMOVE ME, used for debugging Relu
 np.seterr(all='raise')
@@ -99,10 +100,11 @@ def load_data(inputs_path: str, targets_path: str, split_pctgs: str) -> (DataSet
 def train(model: NN, train_data: DataSet, dev_data: DataSet, 
                             mb: int, lr: float, epochs: int, report_freq: int):
 
+    num_train_updates = calc_num_updates(train_data.len, mb)
     for epoch in range(1, epochs+1):
         print(f"->\tEpoch {epoch}")
 
-        for ix in range(int(train_data.len/mb)):  # TODO: Fix iteration to ensure last data points not dropped
+        for ix in range(num_train_updates):
             bottom_bound = ix * mb
             upper_bound = bottom_bound + mb
 
@@ -121,8 +123,9 @@ def train(model: NN, train_data: DataSet, dev_data: DataSet,
 def test(model: NN, data: DataSet):
     acc = 0.0
     N = data.len
-    mb = 32
+    mb = 64
 
+    num_updates = calc_num_updates(data.len, mb)
     for ix in range(int(data.len/mb)):
         bottom_bound = ix * mb
         upper_bound = bottom_bound + mb
